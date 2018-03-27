@@ -65,6 +65,7 @@ model (e.g. `AttributeInfo` object).
 * [tangojs-image](#image)
 * [tangojs-form](#form)
 * [tangojs-device-tree](#devicetree)
+* [tangojs-group](#group)
 
 ### Label
 
@@ -78,7 +79,8 @@ constant rate.
   model="my/dev/01/attr01"
   poll-period="1000"
   show-name
-  show-unit>
+  show-unit
+  precision="3">
 </tangojs-label>
 ```
 
@@ -91,6 +93,7 @@ pollPeriod  | number  | poll-period  | Poll period in milliseconds.
 showName    | boolean | show-name    | Should display name.
 showUnit    | boolean | show-unit    | Should display unit.
 showQuality | boolean | show-quality | Should display quality led.
+precision   | number  | precision    | Number of decimal digits.
 
 ### LineEdit
 
@@ -155,7 +158,9 @@ Displays device state.
   model="my/dev/01"
   poll-period="1000"
   show-name
-  show-led>
+  show-led
+  show-value
+  only-name>
 </tangojs-state-led>
 ```
 
@@ -167,6 +172,8 @@ model      | string  | model       | Full device name.
 pollPeriod | number  | poll-period | Poll period in milliseconds.
 showName   | boolean | show-name   | Should display name.
 showLed    | boolean | show-led    | Should display led.
+showValue  | boolean | show-value  | Should display value as string.
+onlyName   | boolean | only-name   | Show only device name, instead of full path.
 
 ### Plot
 
@@ -284,8 +291,36 @@ None.
 
 #### API
 
-* `getSelections(): Array<T>`,
+* `getSelections(): Array<T>`, where `T` is
+  ```
+  {
+    key: string,
+    path: Array<string>,
+    value: { model: string, info: (DeviceInfo|AttributeInfo|CommandInfo) }
+  }
+  ```
 * `clearSelections(): undefined`,
 * `collapse(): undefined`,
 * `collapseAt(level: Number)`,
 * `expand(): undefined`.
+
+### Group
+
+Groups several attributes into one widget. Shows device name, state,
+attribute value and unit.
+
+#### Examples
+
+```html
+<tangojs-group
+  model="sys/tg_test/1/long_scalar,sys/tg_test/1/double_scalar"
+  name="Test group">
+</tangojs-group>
+```
+
+#### Attributes
+
+Property   | Type     | Attribute   | Remarks
+---------- | -------- | ----------- | -------
+model      | string[] | model       | Array of attribute names.
+name       | string   | name        | Group title.

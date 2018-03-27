@@ -9,14 +9,14 @@
 <template>
 
   <style>
-    #root {
+    /*#root {
       grid-template-columns: 1fr 1fr 1fr 30px 20px;
     }
     #name  { grid-column: 1; }
     #value { grid-column: 2; }
     #input { grid-column: 3; }
     #unit  { grid-column: 4; }
-    #led   { grid-column: 5; }
+    #led   { grid-column: 5; }*/
   </style>
 
   <div id="root" class="tangojs-form-row">
@@ -81,7 +81,10 @@
 
     updateDueToModelChange (attributeInfo) {
       this.dom.name.textContent = attributeInfo.name
-      this.dom.unit.textContent = attributeInfo.display_unit
+      var unit = attributeInfo.display_unit
+      if(unit === "No display unit")    // filter this, why it even works that way?
+        unit = attributeInfo.unit       // here, if no unit is set, proper empty string is returned
+      this.dom.unit.textContent = unit
     }
 
     onModelRead (deviceAttributes) {
@@ -97,6 +100,8 @@
 
     updateValueAndQuality (value, quality) {
       this.dom.led.color = this.getQualityLedColor(quality)
+      if(this.precision)
+        value = value.toFixed(this.precision)
       this.dom.value.textContent = value
     }
 
@@ -112,7 +117,8 @@
     }
 
     toggleVisibility (node, show) {
-      node.style.visibility = show ? 'visible' : 'hidden'
+      // node.style.visibility = show ? 'visible' : 'hidden'
+      node.style.display = show ? 'inline-block' : 'none'
     }
 
     onShowQualityChange (showQuality) {
@@ -125,6 +131,10 @@
 
     onShowUnitChange (showUnit) {
       this.toggleVisibility(this.dom.unit, showUnit)
+    }
+
+    onPrecisionChange (precision) {
+      this.precision = precision
     }
 
   }
@@ -161,6 +171,10 @@
       showUnit: {
         type: 'boolean',
         onChange: TangoJsLabelElement.prototype.onShowUnitChange
+      },
+      precision: {
+        type: 'number',
+        onChange: TangoJsLabelElement.prototype.onPrecisionChange
       }
     })
 
@@ -179,7 +193,8 @@
         'poll-period': { type: Number },
         'show-quality': { type: Boolean },
         'show-name': { type: Boolean },
-        'show-unit': { type: Boolean }
+        'show-unit': { type: Boolean },
+        'precision': { type: Number }
       }
     })
 
